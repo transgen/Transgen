@@ -3,26 +3,26 @@ package com.transgen.api.enums;
 /**
  * An enum containing all standard AAMVA fields, their data ref and description
  */
-public enum AAMVAField{
-    DCA("a", "Jurisdiction-specific vehicle class"),
-    DCB("b", "Jurisdiction-specific restriction codes"),
-    DCD("c", "Jurisdiction-specific endorsement codes"),
-    DBA("d", "Document Expiration Date"),
-    DCS("e", "Customer Family Name"),
-    DAC("f", "Customer First Name"),
-    DAD("g", "Customer Middle Name(s)"),
-    DBD("h", "Document Issue Date"),
+public enum AAMVAFieldSimple {
+    DCA("a", "Vehicle Class"),
+    DCB("b", "Restriction Codes"),
+    DCD("c", "Endorsement Codes"),
+    DBA("d", "Expiration Date"),
+    DCS("e", "Last Name"),
+    DAC("f", "First Name"),
+    DAD("g", "Middle Name(s)"),
+    DBD("h", "Issue Date"),
     DBB("i", "Date of Birth"),
-    DBC("j", "Physical Description Sex"),
-    DAY("k", "Physical Description Eye Color"),
-    DAU("l", "Physical Description Height"),
+    DBC("j", "Sex"),
+    DAY("k", "Eye Color"),
+    DAU("l", "Height"),
     DAG("m", "Address Street 1"),
     DAI("n", "Address City"),
     DAJ("o", "Address Jurisdiction Code"),
     DAK("p", "Address Postal Code"),
-    DAQ("q", "Customer ID Number"),
+    DAQ("q", "ID Number"),
     DCF("r", "Document Discriminator"),
-    DCG("s", "Country Identification"),
+    DCG("s", "Country"),
     DDE("t", "Family name truncation"),
     DDF("u", "First name truncation"),
     DDG("v", "Middle name truncation"),
@@ -40,9 +40,9 @@ public enum AAMVAField{
     DCM("l", "Standard vehicle classification"),
     DCN("m", "Standard endorsement code"),
     DCO("n", "Standard restriction code"),
-    DCP("o", "Jurisdiction- specific vehicle classification description"),
-    DCQ("p", "Jurisdiction- specific endorsement code description"),
-    DCR("q", "Jurisdiction- specific restriction code description"),
+    DCP("o", "Vehicle Classification"),
+    DCQ("p", "Endorsement Code"),
+    DCR("q", "Restriction Code"),
     DDA("r", "Compliance Type"),
     DDB("s", "Card Revision Date"),
     DDC("t", "HAZMAT Endorsement Expiration Date"),
@@ -64,7 +64,7 @@ public enum AAMVAField{
      * @param dataRef     - the data reference for this field
      * @param elementDesc - the text description of this field
      */
-    private AAMVAField(final String dataRef, final String elementDesc) {
+    private AAMVAFieldSimple(final String dataRef, final String elementDesc) {
         this.dataRef = dataRef;
         this.elementDesc = elementDesc;
     }

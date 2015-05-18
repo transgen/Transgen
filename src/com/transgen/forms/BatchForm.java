@@ -3,6 +3,7 @@ package com.transgen.forms;
 import com.transgen.TransGen;
 import com.transgen.api.StateGenerator;
 import com.transgen.api.enums.AAMVAField;
+import com.transgen.api.enums.AAMVAFieldSimple;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -25,14 +26,14 @@ public class BatchForm {
     private JComboBox chooseAState;
     private JTextArea csvExample;
 
-    public BatchForm() {
+    public BatchForm(Boolean simple) {
         Object[] sortedArray = TransGen.getInstance().getStateGenerators().keySet().toArray();
         Arrays.sort(sortedArray);
         chooseAState.setModel(new DefaultComboBoxModel(sortedArray));
-        populateCSVExample(chooseAState);
+        populateCSVExample(chooseAState, simple);
 
         //Populate CSV Example on dropdown selection
-        chooseAState.addActionListener(e -> populateCSVExample(chooseAState));
+        chooseAState.addActionListener(e -> populateCSVExample(chooseAState, simple));
 
         //Browse for a csv file
         browseButton.addActionListener(e -> browseForCSV());
@@ -100,7 +101,7 @@ public class BatchForm {
         }
     }
 
-    public void populateCSVExample(JComboBox jcb) {
+    public void populateCSVExample(JComboBox jcb, boolean simple) {
         String s = (String) jcb.getSelectedItem();
         if (s != null) {
             try {
@@ -124,8 +125,14 @@ public class BatchForm {
                         if (!aamvaFields.contains(f)) {
                             ex += "<UNKNOWN DATA>,";
                         } else {
-                            AAMVAField e = AAMVAField.valueOf(f);
-                            ex += "<" + e.getElementDesc().toUpperCase() + ">,";
+                            if (simple) {
+                                AAMVAFieldSimple e = AAMVAFieldSimple.valueOf(f);
+                                ex += "<" + e.getElementDesc().toUpperCase() + ">,";
+                            }
+                            else{
+                                AAMVAField e = AAMVAField.valueOf(f);
+                                ex += "<" + e.getElementDesc().toUpperCase() + ">,";
+                            }
                         }
 
                     }
@@ -142,13 +149,16 @@ public class BatchForm {
         }
     }
 
-    public void main() {
+    public void main(Boolean simple) {
         JFrame frame = new JFrame("BatchForm");
-        frame.setTitle("Generate Multiple Barcodes");
-        frame.setContentPane(new BatchForm().BatchForm);
+        frame.setTitle("TransGen™ - Multiple Barcodes");
+        frame.setContentPane(new BatchForm(simple).BatchForm);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ImageIcon img = new ImageIcon(getClass().getResource("Transgen.jpg"));
+        frame.setIconImage(img.getImage());
         frame.pack();
-        frame.setSize(500, 700);
+        frame.setSize(700, 700);
         frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
     }
 }

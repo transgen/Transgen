@@ -1,8 +1,11 @@
 package com.transgen.forms;
 
 import com.transgen.TransGen;
+import com.transgen.Utils;
 import com.transgen.api.StateGenerator;
+import com.transgen.api.enums.AAMVAExamples;
 import com.transgen.api.enums.AAMVAField;
+import com.transgen.api.enums.AAMVAFieldSimple;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -10,10 +13,8 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class SingleForm {
     private JPanel SingleForm;
@@ -24,15 +25,23 @@ public class SingleForm {
     private JFormattedTextField twoDW;
     private JFormattedTextField oneDW;
     private JFormattedTextField oneDH;
+    private JCheckBox autoPopulateCheckBox;
 
     private HashMap<String, JTextField> fields;
 
-    public SingleForm() {
-        chooseAState.setModel(new DefaultComboBoxModel(TransGen.getInstance().getStateGenerators().keySet().toArray()));
+    public SingleForm(Boolean simple) {
+        autoPopulateCheckBox.doClick();
+        Object[] sortedArray = TransGen.getInstance().getStateGenerators().keySet().toArray();
+        Arrays.sort(sortedArray);
+        chooseAState.setModel(new DefaultComboBoxModel(sortedArray));
 
         //Populate data fields
-        chooseAState.addActionListener(e -> populateDataFields(chooseAState));
-        populateDataFields(chooseAState);
+
+
+            autoPopulateCheckBox.addActionListener(e -> populateDataFields(chooseAState, simple));
+            chooseAState.addActionListener(e -> populateDataFields(chooseAState, simple));
+            populateDataFields(chooseAState, simple);
+
 
         //Generate the barcode data
         generateBarcodeButton.addActionListener(e -> generateData());
@@ -58,6 +67,8 @@ public class SingleForm {
         twoDW.addKeyListener(listener);
         oneDH.addKeyListener(listener);
         oneDW.addKeyListener(listener);
+
+
     }
 
     public void generateData() {
@@ -79,14 +90,21 @@ public class SingleForm {
 
     }
 
-    private void populateDataFields(JComboBox jcb) {
+    private void populateDataFields(JComboBox jcb, Boolean simple) {
         String s = (String) jcb.getSelectedItem();
         if (s != null) {
             try {
                 StateGenerator sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(s), new String[]{});
                 Set<String> aamvaFields = new HashSet<String>();
-                for (AAMVAField f : AAMVAField.values()) {
-                    aamvaFields.add(f.name());
+                if (simple) {
+                    for (AAMVAFieldSimple f : AAMVAFieldSimple.values()) {
+                        aamvaFields.add(f.name());
+                    }
+                }
+                else{
+                    for (AAMVAField f : AAMVAField.values()) {
+                        aamvaFields.add(f.name());
+                    }
                 }
 
                 int amt = 0;
@@ -99,34 +117,49 @@ public class SingleForm {
                 scrollPane.setLayout(new BorderLayout());
                 JPanel labelPanel = new JPanel(new GridLayout(amt, 1));
                 JPanel fieldPanel = new JPanel(new GridLayout(amt, 1));
-                labelPanel.setMaximumSize(new Dimension(1000, 400));
-                fieldPanel.setMaximumSize(new Dimension(1000, 400));
+                labelPanel.setMaximumSize(new Dimension(700, 400));
+                fieldPanel.setMaximumSize(new Dimension(700, 400));
                 scrollPane.add(labelPanel, BorderLayout.WEST);
                 scrollPane.add(fieldPanel, BorderLayout.CENTER);
 
                 for (String d : sg.getDocuments()) {
                     for (String f : sg.getFields(d)) {
-                        JLabel l = new JLabel((aamvaFields.contains(f) ? (AAMVAField.valueOf(f).getElementDesc() + " ") : "") + "(" + f + ")");
-                        JTextField t = new JTextField();
-                        labelPanel.add(l);
-                        fieldPanel.add(t);
-                        fields.put(f, t);
+                        if (simple) {
+                            JLabel l = new JLabel((aamvaFields.contains(f) ? (AAMVAFieldSimple.valueOf(f).getElementDesc() + " ") : f));
+                            JTextField t = new JTextField();
+                            if (autoPopulateCheckBox.isSelected()){
+                                t.setText(sg.getExamples().get(f));
+                            }
+                            labelPanel.add(l);
+                            fieldPanel.add(t);
+                            fields.put(f, t);
+                        }
+                        else{
+                            JLabel l = new JLabel((aamvaFields.contains(f) ? (AAMVAField.valueOf(f).getElementDesc() +  " " + "(" + f + ")") : f ));
+                            JTextField t = new JTextField();
+                            labelPanel.add(l);
+                            fieldPanel.add(t);
+                            fields.put(f, t);
+                        }
+
                     }
                 }
-
             } catch (Exception E) {
                 JOptionPane.showMessageDialog(null, E.getMessage());
             }
         }
     }
 
-    public void main() {
+    public void main(Boolean simple) {
         JFrame frame = new JFrame("SingleForm");
-        frame.setTitle("Generate A Single Barcode");
-        frame.setContentPane(new SingleForm().SingleForm);
+        frame.setTitle("TransGen™ -  Single Barcode");
+        frame.setContentPane(new SingleForm(simple).SingleForm);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ImageIcon img = new ImageIcon(getClass().getResource("Transgen.jpg"));
+        frame.setIconImage(img.getImage());
         frame.pack();
-        frame.setSize(500, 700);
+        frame.setSize(700, 700);
         frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
     }
 }

@@ -80,6 +80,14 @@ public abstract class StateGenerator {
         return null;
     }
 
+    /**
+     * Get a HashMap of examples of fields. Must be overridden in subclass.
+     *
+     * @return HashMap of fields and examples for this state
+     */
+    public LinkedHashMap<String, String> getExamples(){
+        return null;
+    }
 
     /**
      * Pad a string with spaces on the right

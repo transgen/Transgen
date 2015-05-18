@@ -65,6 +65,34 @@ public class Test {
         return out;
     }
 
+    public String generateExampleHash(State s, String real) {
+        String out = "";
+        out += "public LinkedHashMap<String, String> getExamples() { \n";
+        out += "        LinkedHashMap<String, String> dl = new LinkedHashMap<String, String>();\n";
+        for (String l : parseBarcodeData(s, real)) {
+            if (l.split("::").length > 1) {
+                if (l.split("::")[0].equals("DCS"))
+                    out += ("dl.put(\"" + l.split("::")[0] + "\",\"" + "SMITH") + "\");" + "\n";
+                else if (l.split("::")[0].equals("DAC"))
+                    out += ("dl.put(\"" + l.split("::")[0] + "\",\"" + "JOHN") + "\");" + "\n";
+                else if (l.split("::")[0].equals("DAD"))
+                    out += ("dl.put(\"" + l.split("::")[0] + "\",\"" + "JOE") + "\");" + "\n";
+                else if (l.split("::")[0].equals("DAG"))
+                    out += ("dl.put(\"" + l.split("::")[0] + "\",\"" + "111 1ST STREET") + "\");" + "\n";
+                else if (l.split("::")[0].equals("DAI"))
+                    out += ("dl.put(\"" + l.split("::")[0] + "\",\"" + "SPRINGFIELD") + "\");" + "\n";
+                else
+                    out += ("dl.put(\"" + l.split("::")[0] + "\",\"" + l.split("::")[1]) + "\");" + "\n";
+            }
+
+            else
+                out += ("dl.put(\"" + l.split("::")[0] + "\",\"") + "\");" + "\n";
+        }
+        out += "return dl;\n";
+        out += "}";
+        return out;
+    }
+
     public ArrayList<String> parseBarcodeData(State s, String out) {
         String curr = "";
         String[] split = out.split("DL[0-9]{8}?");
