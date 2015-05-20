@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class BatchForm {
@@ -57,10 +58,12 @@ public class BatchForm {
             JOptionPane.showMessageDialog(null, "Error: couldn't read CSV file.");
             return;
         }
-
+        String delim = ",";
+        String regex = "(?<!\\\\)" + Pattern.quote(delim);
         ArrayList<String> data = new ArrayList<String>();
         String[] header = lines.get(0).split(",");
-        String[] fields = lines.get(1).split(",");
+        String[] fields = lines.get(1).split(regex);
+
 
         if (chooseAState.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(null, "Error: You must choose a state.");
@@ -71,8 +74,9 @@ public class BatchForm {
         }
 
         for (int i = 1; i < lines.size(); i++) {
-            String[] l = lines.get(i).split(",", -1);
+            String[] l = lines.get(i).split(regex, -1);
             for (int j = 0; j < l.length; j++) {
+                l[j] = l[j].replaceAll("\\\\","");
                 data.add(header[j] + "::" + l[j]);
             }
             try {
