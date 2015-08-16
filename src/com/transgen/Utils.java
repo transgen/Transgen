@@ -99,4 +99,57 @@ public class Utils {
 
         return false;
     }
+
+    public static int tryParseInt(String value, int defaultValue) {
+        try {
+            return Integer.parseInt(value);
+        } catch(NumberFormatException nfe) {
+            // Log exception.
+            return defaultValue;
+        }
+    }
+
+    public static String substring(String str, int start, int end) {
+        if (str == null) {
+            return null;
+        }
+
+        // handle negatives
+        if (end < 0) {
+            end = str.length() + end; // remember end is negative
+        }
+        if (start < 0) {
+            start = str.length() + start; // remember start is negative
+        }
+
+        // check length next
+        if (end > str.length()) {
+            end = str.length();
+        }
+
+        // if start is greater than end, return ""
+        if (start > end) {
+            return "";
+        }
+
+        if (start < 0) {
+            start = 0;
+        }
+        if (end < 0) {
+            end = 0;
+        }
+
+        return str.substring(start, end);
+    }
+
+    public static byte calculateLRC(byte[] bytes)
+    {
+        byte LRC = 0;
+        for (int i = 0; i < bytes.length; i++)
+        {
+            LRC ^= bytes[i];
+        }
+        return LRC;
+    }
 }
+

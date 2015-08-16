@@ -42,7 +42,7 @@ public class TransGen {
         stateGenerators = loadStateScripts();
         System.out.println("[INFO] Loaded " + stateGenerators.size() + " scripts.");
         System.out.println("[INFO] Testing loaded scripts...");
-        testStateScripts(stateGenerators);
+        //testStateScripts(stateGenerators);
         System.out.println("[INFO] All scripts tested.");
     }
 

@@ -28,7 +28,7 @@ public class BarcodeAnalyzer {
         TransGen.debug = true;
         System.out.println("Working Directory = " +
                 System.getProperty("user.dir"));
-        BufferedImageLuminanceSource bils = new BufferedImageLuminanceSource(ImageIO.read(new File(System.getProperty("user.dir") + "\\Barcodes\\O21\\WV.jpg")));
+        BufferedImageLuminanceSource bils = new BufferedImageLuminanceSource(ImageIO.read(new File(System.getProperty("user.dir") + "\\Barcodes\\O21\\bc.jpg")));
         HybridBinarizer hb = new HybridBinarizer(bils);
 
         BinaryBitmap bitmap = new BinaryBitmap(hb);
@@ -48,11 +48,12 @@ public class BarcodeAnalyzer {
 
         //System.out.println(res.getRawBytes());
         //byte[] bt = res.getRawBytes();
-
+        System.out.println(res.getRawBytes());
+        System.out.println(res.getText());
         byte[] converted = Base64.encode(res.getText().getBytes());
 
-        System.out.println(converted);
-       try (OutputStream stream = new FileOutputStream("testing/" + "WV" + ".b64")) {
+        System.out.println(converted.toString());
+       try (OutputStream stream = new FileOutputStream("testing/" + "MT" + ".b64")) {
             stream.write(converted);
         }
         TransGen transGen = new TransGen();
@@ -63,11 +64,11 @@ public class BarcodeAnalyzer {
         System.out.println(Utils.repr(res.getText()));
 
         HashMap < String, Class > stateScripts = transGen.getStateGenerators();
-        Test t = new Test(stateScripts.get("WV"));
-        //System.out.println(t.generateFieldHashMap(State.MAINE, res.getText()));
-        System.out.println(t.generateExampleHash(State.WEST_VIRGINIA, res.getText()));
-       // System.out.println(t.parseBarcodeData(State.MAINE, res.getText()));
-       // t.runTest();
+        Test t = new Test(stateScripts.get("MT"));
+        System.out.println(t.generateFieldHashMap(State.MONTANA, res.getText()));
+        System.out.println(t.generateExampleHash(State.MONTANA, res.getText()));
+       System.out.println(t.parseBarcodeData(State.MONTANA, res.getText()));
+       t.runTest();
         //t.printStateReport(clazz, res.getText());
 
     }

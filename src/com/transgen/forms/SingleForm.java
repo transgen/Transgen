@@ -3,7 +3,6 @@ package com.transgen.forms;
 import com.transgen.TransGen;
 import com.transgen.Utils;
 import com.transgen.api.StateGenerator;
-import com.transgen.api.enums.AAMVAExamples;
 import com.transgen.api.enums.AAMVAField;
 import com.transgen.api.enums.AAMVAFieldSimple;
 
@@ -13,7 +12,6 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class SingleForm {
@@ -26,6 +24,8 @@ public class SingleForm {
     private JFormattedTextField oneDW;
     private JFormattedTextField oneDH;
     private JCheckBox autoPopulateCheckBox;
+    private JFormattedTextField UI_fileName;
+
 
     private HashMap<String, JTextField> fields;
 
@@ -38,9 +38,9 @@ public class SingleForm {
         //Populate data fields
 
 
-            autoPopulateCheckBox.addActionListener(e -> populateDataFields(chooseAState, simple));
-            chooseAState.addActionListener(e -> populateDataFields(chooseAState, simple));
-            populateDataFields(chooseAState, simple);
+        autoPopulateCheckBox.addActionListener(e -> populateDataFields(chooseAState, simple));
+        chooseAState.addActionListener(e -> populateDataFields(chooseAState, simple));
+        populateDataFields(chooseAState, simple);
 
 
         //Generate the barcode data
@@ -67,8 +67,6 @@ public class SingleForm {
         twoDW.addKeyListener(listener);
         oneDH.addKeyListener(listener);
         oneDW.addKeyListener(listener);
-
-
     }
 
     public void generateData() {
@@ -80,14 +78,13 @@ public class SingleForm {
         for (String s : fields.keySet()) data.add(s + "::" + fields.get(s).getText());
         try {
             StateGenerator sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(chooseAState.getSelectedItem()), data.toArray(new String[data.size()]));
-            sg.generate(Integer.parseInt(twoDW.getText()), Integer.parseInt(twoDH.getText()), Integer.parseInt(oneDW.getText()), Integer.parseInt(oneDH.getText()));
+            sg.generate(Utils.tryParseInt(twoDW.getText(), 718), Utils.tryParseInt(twoDH.getText(), 200), Utils.tryParseInt(oneDW.getText(), 500), Utils.tryParseInt(oneDH.getText(), 200), UI_fileName.getText());
 
             JOptionPane.showMessageDialog(null, "Success: Barcodes generated in program root -> " + new File("").getAbsolutePath());
         }
         catch (Exception E){
             JOptionPane.showMessageDialog(null, E.getMessage());
         }
-
     }
 
     private void populateDataFields(JComboBox jcb, Boolean simple) {
@@ -127,7 +124,7 @@ public class SingleForm {
                         if (simple) {
                             JLabel l = new JLabel((aamvaFields.contains(f) ? (AAMVAFieldSimple.valueOf(f).getElementDesc() + " ") : f));
                             JTextField t = new JTextField();
-                            if (autoPopulateCheckBox.isSelected()){
+                            if (autoPopulateCheckBox.isSelected() && sg.getExamples().containsKey(f)){
                                 t.setText(sg.getExamples().get(f));
                             }
                             labelPanel.add(l);
@@ -137,11 +134,13 @@ public class SingleForm {
                         else{
                             JLabel l = new JLabel((aamvaFields.contains(f) ? (AAMVAField.valueOf(f).getElementDesc() +  " " + "(" + f + ")") : f ));
                             JTextField t = new JTextField();
+                            if (autoPopulateCheckBox.isSelected()){
+                                t.setText(sg.getExamples().get(f));
+                            }
                             labelPanel.add(l);
                             fieldPanel.add(t);
                             fields.put(f, t);
                         }
-
                     }
                 }
             } catch (Exception E) {
@@ -153,7 +152,7 @@ public class SingleForm {
     public void main(Boolean simple) {
         JFrame frame = new JFrame("SingleForm");
         frame.setTitle("TransGen™ -  Single Barcode");
-        frame.setContentPane(new SingleForm(simple).SingleForm);
+        frame.setContentPane(this.SingleForm);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         ImageIcon img = new ImageIcon(getClass().getResource("Transgen.jpg"));
         frame.setIconImage(img.getImage());

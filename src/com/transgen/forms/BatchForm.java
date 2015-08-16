@@ -1,6 +1,7 @@
 package com.transgen.forms;
 
 import com.transgen.TransGen;
+import com.transgen.Utils;
 import com.transgen.api.StateGenerator;
 import com.transgen.api.enums.AAMVAField;
 import com.transgen.api.enums.AAMVAFieldSimple;
@@ -81,7 +82,7 @@ public class BatchForm {
             }
             try {
                 StateGenerator sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(chooseAState.getSelectedItem()), data.toArray(new String[data.size()]));
-                sg.generate(Integer.parseInt(fields[1]), Integer.parseInt(fields[2]), Integer.parseInt(fields[3]), Integer.parseInt(fields[4]));
+                sg.generate(Utils.tryParseInt(fields[2], 718), Utils.tryParseInt(fields[3], 200), Utils.tryParseInt(fields[4], 500), Utils.tryParseInt(fields[5], 200), fields[1]);
                 created = true;
             }
             catch(Exception E){
@@ -110,20 +111,21 @@ public class BatchForm {
         if (s != null) {
             try {
                 StateGenerator sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(s), new String[]{});
-                String ex = sg.getStateCode() + ",2D_WIDTH,2D_HEIGHT,1D_WIDTH,1D_HEIGHT,";
+                String ex = sg.getStateCode() + ",CUSTOM_FILENAME_(OPTIONAL),2D_WIDTH,2D_HEIGHT,1D_WIDTH,1D_HEIGHT,";
                 for (String d : sg.getDocuments()) {
                     for (String f : sg.getFields(d)) {
                         ex += f + ",";
                     }
                 }
                 ex = ex.replaceAll(";$", "");
+                ex = ex.substring(0, ex.length() - 1);
                 ex += "\n";
 
                 Set<String> aamvaFields = new HashSet<String>();
                 for (AAMVAField f : AAMVAField.values()) {
                     aamvaFields.add(f.name());
                 }
-                ex += "<STATE>,<2D_WIDTH>,<2D_HEIGHT>,<1D_WIDTH>,<1D_HEIGHT>,";
+                ex += "<STATE>,<CUSTOM_FILENAME_(OPTIONAL)>,<2D_WIDTH>,<2D_HEIGHT>,<1D_WIDTH>,<1D_HEIGHT>,";
                 for (String d : sg.getDocuments()) {
                     for (String f : sg.getFields(d)) {
                         if (!aamvaFields.contains(f)) {
@@ -142,7 +144,9 @@ public class BatchForm {
                     }
                 }
                 ex = ex.replaceAll(";$", "");
+                ex = ex.substring(0, ex.length() - 1);
                 ex += "\n";
+
                 csvExample.setLineWrap(true);
                 csvExample.setText(ex);
             }
@@ -156,7 +160,7 @@ public class BatchForm {
     public void main(Boolean simple) {
         JFrame frame = new JFrame("BatchForm");
         frame.setTitle("TransGen™ - Multiple Barcodes");
-        frame.setContentPane(new BatchForm(simple).BatchForm);
+        frame.setContentPane(this.BatchForm);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         ImageIcon img = new ImageIcon(getClass().getResource("Transgen.jpg"));
         frame.setIconImage(img.getImage());
