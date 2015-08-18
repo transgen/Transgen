@@ -82,7 +82,7 @@ public class BatchForm {
             }
             try {
                 StateGenerator sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(chooseAState.getSelectedItem()), data.toArray(new String[data.size()]));
-                sg.generate(Utils.tryParseInt(fields[2], 718), Utils.tryParseInt(fields[3], 200), Utils.tryParseInt(fields[4], 500), Utils.tryParseInt(fields[5], 200), fields[1]);
+                sg.generate(Utils.tryParseInt(l[2], 718), Utils.tryParseInt(l[3], 200), Utils.tryParseInt(l[4], 500), Utils.tryParseInt(l[5], 200), l[1]);
                 created = true;
             }
             catch(Exception E){
