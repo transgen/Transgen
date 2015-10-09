@@ -373,9 +373,18 @@ public abstract class StateGenerator {
     /**
      * Should we include the document headers?
      *
-     * @return whether or not we should include the doucment headers
+     * @return whether or not we should include the document headers
      */
     public abstract Boolean includeDocumentHeaders();
+
+    /**
+     * Should we include the second document headers?
+     *
+     * @return whether or not we should include the second document headers
+     */
+    public Boolean includeSecondDocumentHeaders(){
+        return includeDocumentHeaders();
+    }
 
     /**
      * Should we remove the final terminal and only use the common terminal?
@@ -443,9 +452,15 @@ public abstract class StateGenerator {
         int i = 0;
         for (String doc : this.getDocuments()) {
             i++;
-            Integer doc_len = includeDocumentHeaders() ? doc.length() : 0;
-            if (includeDocumentHeaders()) body += doc;
-
+            Integer doc_len;
+            if (i != 2) {
+                doc_len = includeDocumentHeaders() ? doc.length() : 0;
+                if (includeDocumentHeaders()) body += doc;
+            }
+            else {
+                doc_len = includeSecondDocumentHeaders() ? doc.length() : 0;
+                if (includeSecondDocumentHeaders()) body += doc;
+            }
             for (String field : this.getFields(doc)) {
                 String val = getSpecialField(doc, field);
                 if (val == null)
