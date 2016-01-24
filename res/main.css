@@ -1,0 +1,4 @@
+#console_output.text-area *.content {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}

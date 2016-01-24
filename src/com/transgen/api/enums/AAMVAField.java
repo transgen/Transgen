@@ -1,9 +1,9 @@
 package com.transgen.api.enums;
 
 /**
- * An enum containing all standard AAMVA fields, their data ref and description
+ * An enum containing all standard AAMVA fields, their data ref and description.
  */
-public enum AAMVAField{
+public enum AAMVAField {
     DCA("a", "Jurisdiction-specific vehicle class"),
     DCB("b", "Jurisdiction-specific restriction codes"),
     DCD("c", "Jurisdiction-specific endorsement codes"),
@@ -53,7 +53,20 @@ public enum AAMVAField{
     DDI("y", "Under 19 Until"),
     DDJ("z", "Under 21 Until"),
     DDK("aa", "Organ Donor Indicator"),
-    DDL("ab", "Veteran Indicator");
+    DDL("ab", "Veteran Indicator"),
+
+    // These are outdated but some states still use them.
+    DAP("41", "Driver Residence Postal Code"),
+    DAA("1", "Driver License Name"),
+    DAR("8", "Driver License Classification Code"),
+    DAS("9", "Driver License Restriction Code "),
+    DAT("10", "Driver License Endorsements Code"),
+    DAL("37", "DDriver Residence Street Address 1"),
+    DAN("39", "Driver Residence City"),
+    DAO("40", "Driver Residence Jurisdiction Code"),
+    DBH("47", "Organ Donor"),
+    DCH("u", "Federal Commercial Vehicle Codes"),
+    DCT("f", "Customer Given Names");
 
     private final String dataRef;
     private final String elementDesc;

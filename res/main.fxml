@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane fx:id="main_pane" dividerPositions="0.7051282051282052" orientation="VERTICAL" prefHeight="626.0" prefWidth="829.0" style="-fx-background-insets: 0, 0 0 0 0; -fx-border-color: transparent -fx-box-border transparent #BBBBBB; -fx-border-insets: 0, 0 0 0 0; -fx-opaque-insets: 0, 0 0 0 0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.transgen.forms.MainApplicationController">
+   <items>
+      <AnchorPane prefHeight="526.0" prefWidth="822.0">
+         <children>
+            <MenuBar prefHeight="25.0" prefWidth="600.0" AnchorPane.bottomAnchor="408.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <menus>
+                  <Menu mnemonicParsing="false" text="File">
+                     <items>
+                        <MenuItem id="generate_button" fx:id="generate" mnemonicParsing="false" text="Generate">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator>
+                        </MenuItem>
+                        <MenuItem id="exit_button" fx:id="exit" mnemonicParsing="false" text="Exit" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Settings">
+                     <items>
+                        <CheckMenuItem id="show_simple" fx:id="show_simple" mnemonicParsing="false" text="Show Simple Descriptions" />
+                        <CheckMenuItem id="populate_example_info" fx:id="populate_example_info" mnemonicParsing="false" text="Auto-popualte Example Info" />
+                        <CheckMenuItem id="populate_dates" fx:id="populate_dates" disable="true" mnemonicParsing="false" text="Auto-populate Dates" />
+                        <CheckMenuItem id="populate_id_num" fx:id="populate_id_num" mnemonicParsing="false" text="Auto-populate ID Numbers" />
+                        <CheckMenuItem fx:id="generate_mags" mnemonicParsing="false" text="Generate Mag Stripe Data" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem id="documentation" fx:id="documentation" mnemonicParsing="false" text="Documentation" />
+                        <MenuItem id="github" fx:id="github" mnemonicParsing="false" text="GitHub" />
+                        <MenuItem id="version" fx:id="version" mnemonicParsing="false" text="Version: 2.0" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <TabPane fx:id="main_tab_pane" layoutY="25.0" prefHeight="408.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+              <tabs>
+                <Tab fx:id="single_barcode_tabl" text="Single Barcode">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="379.0" prefWidth="591.0">
+                           <children>
+                              <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="-8.0" layoutY="45.0" prefHeight="334.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" style="-fx-border-style: none; -fx-border-color: transparent; -fx-border-width: 0px;">
+                                       <children>
+                                          <TableView id="data_table" fx:id="data_table" editable="true" prefHeight="336.0" prefWidth="600.0" style="-fx-border-width: 0px; -fx-border-style: none; -fx-border-image-width: 0px; -fx-border-color: transparent; -fx-background-insets: 0, 0 0 0 0; -fx-border-insets: 0, 0 0 0 0; -fx-opaque-insets: 0, 0 0 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                              <TableColumn id="data_table_fields" editable="false" prefWidth="280.0" sortable="false" text="Field" />
+                                              <TableColumn id="data_table_values" prefWidth="542.0" sortable="false" text="Value" />
+                                            </columns>
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </TableView>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                              <ToolBar prefHeight="40.0" prefWidth="827.0" style="-fx-background-insets: 0, 0 0 0 0;" AnchorPane.bottomAnchor="342.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <items>
+                                    <ChoiceBox id="single_barcode_state" fx:id="single_barcode_state" prefHeight="25.0" prefWidth="62.0" />
+                                    <TextField id="2d_width" fx:id="td_width" prefHeight="25.0" prefWidth="175.0" promptText="2D Width" />
+                                    <TextField id="2d_height" fx:id="td_height" prefHeight="25.0" prefWidth="175.0" promptText="2D Height" />
+                                    <TextField id="1d_width" fx:id="od_width" prefHeight="25.0" prefWidth="175.0" promptText="1D Width" />
+                                    <TextField id="1d_width" fx:id="od_height" prefHeight="25.0" prefWidth="175.0" promptText="1D Height" />
+                                 </items>
+                              </ToolBar>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab fx:id="multiple_barcodes_tab" text="Multiple Barcodes">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ToolBar prefHeight="40.0" prefWidth="827.0" style="-fx-background-insets: 0, 0 0 0 0;" AnchorPane.bottomAnchor="342.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <items>
+                                    <ChoiceBox id="multi_barcode_state" fx:id="multi_barcode_state" prefHeight="25.0" prefWidth="62.0" />
+                                    <Button id="select_csv" fx:id="select_csv" mnemonicParsing="false" text="Select CSV..." />
+                                    <TextField id="csv_filename" fx:id="csv_filename" prefHeight="25.0" prefWidth="463.0" />
+                                 </items>
+                              </ToolBar>
+                              <TextArea id="csv_example" fx:id="csv_example" editable="false" layoutY="40.0" prefHeight="348.0" prefWidth="827.0" style="-fx-border-color: transparent; -fx-border-style: none; -fx-background-insets: 0, 0 0 0 0;" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+      </AnchorPane>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #000000;">
+         <children>
+            <TextArea id="console_output" fx:id="console" editable="false" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent; -fx-border-style: none; -fx-border-radius: 0px; -fx-background-insets: 0, 0 0 0 0; -fx-background-color: black; -fx-text-fill: white; -fx-highlight-text-fill: black; -fx-highlight-fill: white;" stylesheets="@main.css" text="Console output.." wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <font>
+                  <Font name="Lucida Console" size="11.0" />
+               </font>
+            </TextArea>
+         </children>
+      </AnchorPane>
+   </items>
+</SplitPane>

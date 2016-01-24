@@ -3,6 +3,7 @@ package com.transgen;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Utils {
     private static final char CONTROL_LIMIT = ' ';
@@ -150,6 +151,19 @@ public class Utils {
             LRC ^= bytes[i];
         }
         return LRC;
+    }
+
+    public final static String ALPHA_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public final static String DIGITS = "0123456789";
+
+    public static String randomString(int length, String characterSet) {
+        String out = "";
+        Random r = new Random();
+        for(int i = 0; i < length; i++) {
+            int j = r.nextInt(characterSet.length());
+            out += characterSet.charAt(j);
+        }
+        return out;
     }
 }
 

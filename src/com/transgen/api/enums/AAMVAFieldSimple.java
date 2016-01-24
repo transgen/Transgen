@@ -53,7 +53,20 @@ public enum AAMVAFieldSimple {
     DDI("y", "Under 19 Until"),
     DDJ("z", "Under 21 Until"),
     DDK("aa", "Organ Donor Indicator"),
-    DDL("ab", "Veteran Indicator");
+    DDL("ab", "Veteran Indicator"),
+
+    // These are outdated but some states still use them.
+    DAP("41", "Zip Code"),
+    DAA("1", "First Name"),
+    DAR("8", "Classification Code"),
+    DAS("9", "Restriction Code "),
+    DAT("10", "Endorsements Code"),
+    DAL("37", "Street Address"),
+    DAN("39", "Address City"),
+    DAO("40", "Address Jurisdiction Code"),
+    DBH("47", "Organ Donor"),
+    DCH("u", "Federal Commercial Vehicle Codes"),
+    DCT("f", "Given Names");
 
     private final String dataRef;
     private final String elementDesc;
