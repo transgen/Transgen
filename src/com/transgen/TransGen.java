@@ -37,7 +37,7 @@ public class TransGen {
         bg.init();
 
         if (args.length > 1 && args[1].equalsIgnoreCase("true")) {
-            TransGenDaemon.main(args);
+            //TransGenDaemon.main(args);
         } else {
             MainApplication.main(args);
         }
@@ -101,7 +101,8 @@ public class TransGen {
         HashMap<String, Class> out = new HashMap<>();
 
         //Load all files with the .groovy extension
-        File dir = new File("Modules");
+        File dir = new File(new File(TransGen.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent(), "Modules");
+        System.out.println(dir.getAbsolutePath());
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".groovy"));
 
         if (files == null) return out;
