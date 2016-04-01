@@ -1,5 +1,7 @@
 package com.transgen.forms;
 
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.sun.javafx.application.HostServicesDelegate;
 import com.transgen.TransGen;
 import com.transgen.Utils;
@@ -24,9 +26,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -259,12 +262,13 @@ public class MainApplicationController implements Initializable {
                 try {
                     sg.data.replace("DAQ", sg.getClientId());
                 } catch(Exception e) {
+                    e.printStackTrace();
                     System.out.println("[ERROR] Problem generating ID number, assure dates are not malformed and names exist.");
                     return;
                 }
             }
 
-            sg.generate(Utils.tryParseInt(td_width.getText(), 718), Utils.tryParseInt(td_height.getText(), 200), Utils.tryParseInt(od_width.getText(), 500), Utils.tryParseInt(od_height.getText(), 200), dir.getAbsolutePath(), generate_mags.isSelected());
+            sg.generate(Utils.tryParseInt(td_width.getText(), 718), Utils.tryParseInt(td_height.getText(), 200), Utils.tryParseInt(od_width.getText(), 500), Utils.tryParseInt(od_height.getText(), 200), dir.getAbsolutePath(), "", generate_mags.isSelected());
             System.out.println("[SUCCESS] Barcodes generated in -> " + dir.getAbsolutePath());
         }
         catch (Exception e){
@@ -285,7 +289,78 @@ public class MainApplicationController implements Initializable {
             return;
         }
 
-        Boolean created = false;
+        CSVReader reader = null;
+        try {
+            FileChannel ch = new FileInputStream(csv).getChannel();
+            InputStream in = Channels.newInputStream(ch);
+            InputStreamReader is = new InputStreamReader(in, Charset.forName("UTF-8"));
+            CSVReaderBuilder builder = new CSVReaderBuilder(is);
+            reader = builder.withVerifyReader(false).build();
+        } catch (FileNotFoundException e) {
+            System.out.println("[ERROR] the selected file does not exist or no file selected.");
+            return;
+        }
+
+        try {
+            String[] line;
+            int num = 0;
+            while ((line = reader.readNext()) != null) {
+                num++;
+
+                String stateName = line[0].toUpperCase();
+
+                if(!TransGen.getInstance().getStateGenerators().containsKey(stateName)) {
+                    System.out.println("[ERROR] no module exists for the state specified in the csv file on line #" + num + "." );
+                    continue;
+                }
+
+                String filename = line[1];
+                int tdWidth = Integer.parseInt(line[2]);
+                int tdHeight = Integer.parseInt(line[3]);
+                int odWidth = Integer.parseInt(line[4]);
+                int odHeight = Integer.parseInt(line[5]);
+
+                StateGenerator sg = null;
+                try {
+                    sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(stateName), new String[] {});
+                } catch (Exception e) {
+                    System.out.println("[ERROR] failed to run module for " + stateName );
+                }
+
+                String[] data = Arrays.copyOfRange(line, 6, line.length);
+
+                int i = 0;
+                for (String d : sg.getDocuments()) {
+                    for (String f : sg.getFields(d)) {
+                        if(i >= data.length) {
+                            System.out.println("[ERROR] failed to create barcode for line #" + num + ". Too few fields provided." );
+                            continue;
+                        }
+
+                        data[i] = f + "::" + data[i++];
+                    }
+                }
+
+                if(data.length > i) {
+                    System.out.println("[WARNING] too many fields provided on line #" + num + ". Barcode still generated." );
+                    continue;
+                }
+
+                try {
+                    sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(line[0].toUpperCase()), data);
+                } catch (Exception e) {
+                    System.out.println("[ERROR] failed to run module for state on line #" + num + " Check CSV." );
+                }
+                sg.generate(tdWidth, tdHeight, odWidth, odHeight, dir.getAbsolutePath(), filename, generate_mags.isSelected());
+            }
+
+            if(TransGen.debug) System.out.println("[DEBUG] Read " + reader.getRecordsRead() + " records from csv on " + reader.getLinesRead() + " lines.");
+            System.out.println("[SUCCESS] Barcodes generated in -> " + dir.getAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("[ERROR] could not read line from CSV." );
+        }
+
+        /*Boolean created = false;
         ArrayList<String> lines = new ArrayList<>();
 
         try {
@@ -320,7 +395,7 @@ public class MainApplicationController implements Initializable {
 
         }
 
-        if (created) System.out.println("[SUCCESS] Barcodes generated in -> " + dir.getAbsolutePath());
+        if (created) System.out.println("[SUCCESS] Barcodes generated in -> " + dir.getAbsolutePath());*/
     }
 
     private void populateDataTable(TableView table, String state, boolean simple) {
@@ -371,8 +446,10 @@ public class MainApplicationController implements Initializable {
     private void populateCSVExample(TextArea text, String state, boolean simple) {
         if (state != null) {
             try {
+                String ex = "";
                 StateGenerator sg = StateGenerator.instantiateStateScript(TransGen.getInstance().getStateGenerators().get(state), new String[]{});
-                String ex = sg.getStateCode() + ",CUSTOM_FILENAME_(OPTIONAL),2D_WIDTH,2D_HEIGHT,1D_WIDTH,1D_HEIGHT,";
+
+                /*String ex = sg.getStateCode() + ",CUSTOM_FILENAME_(OPTIONAL),2D_WIDTH,2D_HEIGHT,1D_WIDTH,1D_HEIGHT,";
                 for (String d : sg.getDocuments()) {
                     for (String f : sg.getFields(d)) {
                         ex += f + ",";
@@ -380,13 +457,13 @@ public class MainApplicationController implements Initializable {
                 }
                 ex = ex.replaceAll(";$", "");
                 ex = ex.substring(0, ex.length() - 1);
-                ex += "\n";
+                ex += "\n";*/
 
                 Set<String> aamvaFields = new HashSet<String>();
                 for (AAMVAField f : AAMVAField.values()) {
                     aamvaFields.add(f.name());
                 }
-                ex += "<STATE>,<CUSTOM_FILENAME_(OPTIONAL)>,<2D_WIDTH>,<2D_HEIGHT>,<1D_WIDTH>,<1D_HEIGHT>,";
+                ex += state + ",<CUSTOM_FILENAME_(OPTIONAL)>,<2D_WIDTH>,<2D_HEIGHT>,<1D_WIDTH>,<1D_HEIGHT>,";
                 for (String d : sg.getDocuments()) {
                     for (String f : sg.getFields(d)) {
                         if (!aamvaFields.contains(f)) {

@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * This is the general state generator class which every script should inherit.
@@ -28,13 +29,17 @@ public abstract class StateGenerator {
     private final String IIN;
     private final int VERSION;
     private final int JURISDICTION;
-    public LinkedHashMap<String, String> data = new LinkedHashMap<String, String>();
+
     private String CI = Character.toString((char) 64);
     private String LF = Character.toString((char) 10);
     private String RS = Character.toString((char) 30);
     private String CR = Character.toString((char) 13);
+
+    public LinkedHashMap<String, String> data = new LinkedHashMap<String, String>();
     private LinkedHashMap<String, LinkedHashMap<String, Integer>> fields;
+
     private String fileName = "";
+    private String dir = "";
 
     public StateGenerator(String[] data, LinkedHashMap<String, LinkedHashMap<String, Integer>> fields, String code, String type, String iin, Integer ver, Integer juris) {
         for (String s : data) {
@@ -154,8 +159,7 @@ public abstract class StateGenerator {
      */
     public static StateGenerator instantiateStateScript(Class clazz, String[] fields)throws Exception {
         Object aScript = null;
-
-            aScript = clazz.getConstructor(new Class[]{String[].class}).newInstance(new Object[]{fields});
+        aScript = clazz.getConstructor(new Class[]{String[].class}).newInstance(new Object[]{fields});
 
         return (StateGenerator) aScript;
     }
@@ -330,8 +334,8 @@ public abstract class StateGenerator {
      * @param width1d  - the desired width of the 1D barcode in pixels
      * @param height1d - the desired height of the 1D barcode in pixels
      */
-    public void generate(int width2d, int height2d, int width1d, int height1d, String fileName) {
-        generate(width2d, height2d, width1d, height1d, fileName, true);
+    public void generate(int width2d, int height2d, int width1d, int height1d, String dir, String fileName) {
+        generate(width2d, height2d, width1d, height1d, dir, fileName, true);
     }
 
     /**
@@ -343,8 +347,12 @@ public abstract class StateGenerator {
      * @param height1d - the desired height of the 1D barcode in pixels
      * @param includeMag - whether or not to also generate MagStripe data
      */
-    public void generate(int width2d, int height2d, int width1d, int height1d, String fileName, boolean includeMag) {
+    public void generate(int width2d, int height2d, int width1d, int height1d, String dir, String fileName, boolean includeMag) {
+        if(fileName == null) fileName = "";
+
         this.fileName = fileName;
+        this.dir = dir;
+
         this.generate2D(width2d, height2d);
         this.generate1D(width1d, height1d);
         if(includeMag) this.generateMagStripCSV();
@@ -358,7 +366,9 @@ public abstract class StateGenerator {
      * @return the unique filename as a string
      */
     public String getUniqueFilename() {
-        return this.data.get("DAQ");
+        String out = this.data.get("DAQ");
+        if(out == null) out = this.data.get("DCS") + this.data.get("DAC");
+        return out;
     }
 
     /**
@@ -367,7 +377,7 @@ public abstract class StateGenerator {
      * @return the filename suffix
      */
     public String getFilenameSuffix() {
-        return new SimpleDateFormat("yyyyMMddhhmm").format(new Date());
+        return "" + System.currentTimeMillis();
     }
 
     /**
@@ -555,7 +565,13 @@ public abstract class StateGenerator {
             if (Files.notExists(Paths.get(this.getStateCode()))) {
                 Files.createDirectory(Paths.get(this.getStateCode()));
             }
-            FileOutputStream fos = new FileOutputStream(new File(this.getStateCode() + File.separator + "CODE128_" + this.getUniqueFilename() + "_" + this.getFilenameSuffix() + ".png"));
+
+            String fullName = this.getStateCode() + File.separator + "CODE128_" + this.getUniqueFilename() + "_" + this.getFilenameSuffix() + ".png";
+            if(!fileName.equals("")) fullName = this.getStateCode() + File.separator + "CODE128_" + fileName + ".png";
+            File file = new File(dir, fullName);
+            file.mkdirs();
+
+            FileOutputStream fos = new FileOutputStream(file);
             MatrixToImageWriter.writeToStream(matrix, "png", fos);
             fos.close();
         } catch (Exception e) {
@@ -598,7 +614,11 @@ public abstract class StateGenerator {
                 e.printStackTrace();
             }
         }
-        File file = new File(fileName, this.getStateCode() + File.separator + "PDF417_" + this.getUniqueFilename() + "_" + this.getFilenameSuffix() +  ".png");
+
+        String fullName = this.getStateCode() + File.separator + "PDF417_" + this.getUniqueFilename() + "_" + this.getFilenameSuffix() +  ".png";
+        if(!fileName.equals("")) fullName = this.getStateCode() + File.separator + "PDF417_" + fileName + ".png";
+
+        File file = new File(dir, fullName);
 
         try {
             if(!file.exists()) file.mkdirs();
@@ -642,15 +662,12 @@ public abstract class StateGenerator {
         String trackThree = "%" + data.getOrDefault("DAK", "") + data.getOrDefault("DCA", "") + data.getOrDefault("DCB", "") + data.getOrDefault("DBC", "")
                 + data.getOrDefault("DAU", "") + data.getOrDefault("DAX", "") + data.getOrDefault("DAZ", "") + data.getOrDefault("DAY", "") + "?";
 
-        File file = new File(fileName, this.getStateCode() + File.separator + "MagneticStripes" + File.separator + "MAGNETIC_STRIPE_" + this.getFilenameSuffix() + ".txt");
+        String fullName = this.getStateCode() + File.separator + "MagneticStripes" + File.separator + "MAGNETIC_STRIPE_" + this.getFilenameSuffix() + ".txt";
+        if(!fileName.equals("")) fullName = this.getStateCode() + File.separator + "MagneticStripes" + File.separator + "MAGNETIC_STRIPE_" + fileName + ".txt";
 
-        if (Files.notExists(Paths.get(fileName, this.getStateCode() + File.separator + "MagneticStripes"))) {
-            try {
-                Files.createDirectory(Paths.get(fileName, this.getStateCode() + File.separator + "MagneticStripes"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        File file = new File(dir, fullName);
+        new File(file.getParent()).mkdirs();
+
         try{
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
             writer.write(trackOne + System.getProperty("line.separator") + trackTwo + System.getProperty("line.separator") + trackThree + System.getProperty("line.separator"));

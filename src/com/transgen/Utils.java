@@ -1,9 +1,8 @@
 package com.transgen;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class Utils {
     private static final char CONTROL_LIMIT = ' ';

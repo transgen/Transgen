@@ -36,7 +36,11 @@ public class TransGen {
         instance = bg;
         bg.init();
 
-        MainApplication.main(args);
+        if (args.length > 1 && args[1].equalsIgnoreCase("true")) {
+            TransGenDaemon.main(args);
+        } else {
+            MainApplication.main(args);
+        }
     }
 
     public static String getVersion() {
