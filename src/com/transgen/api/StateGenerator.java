@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -562,14 +563,21 @@ public abstract class StateGenerator {
         try {
             Code128Writer c = new Code128Writer();
             BitMatrix matrix = c.encode(data, BarcodeFormat.CODE_128, width, height);
+
             if (Files.notExists(Paths.get(this.getStateCode()))) {
-                Files.createDirectory(Paths.get(this.getStateCode()));
+                try {
+                    Files.createDirectory(Paths.get(this.getStateCode()));
+                } catch (AccessDeniedException e) {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
-            String fullName = this.getStateCode() + File.separator + "CODE128_" + this.getUniqueFilename() + "_" + this.getFilenameSuffix() + ".png";
+            String fullName = this.getStateCode() + File.separator + "CODE128_" + this.getUniqueFilename() + "_" + this.getFilenameSuffix() +  ".png";
             if(!fileName.equals("")) fullName = this.getStateCode() + File.separator + "CODE128_" + fileName + ".png";
+
             File file = new File(dir, fullName);
-            file.mkdirs();
+            if(!file.exists()) file.getParentFile().mkdirs();
 
             FileOutputStream fos = new FileOutputStream(file);
             MatrixToImageWriter.writeToStream(matrix, "png", fos);
@@ -610,6 +618,7 @@ public abstract class StateGenerator {
         if (Files.notExists(Paths.get(this.getStateCode()))) {
             try {
                 Files.createDirectory(Paths.get(this.getStateCode()));
+            } catch (AccessDeniedException e) {
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -625,8 +634,7 @@ public abstract class StateGenerator {
             ImageIO.write(dest, "png", file);
         }
          catch (IOException e) {
-            System.out.println("Write error for " + file.getPath() +
-                    ": " + e.getMessage());
+            System.out.println("Write error for " + file.getPath() + ": " + e.getMessage());
         }
     }
 

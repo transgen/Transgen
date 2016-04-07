@@ -102,7 +102,7 @@ public class TransGen {
 
         //Load all files with the .groovy extension
         File dir = new File(new File(TransGen.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent(), "Modules");
-        System.out.println(dir.getAbsolutePath());
+        if(debug) System.out.println("Running in: " + dir.getAbsolutePath());
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".groovy"));
 
         if (files == null) return out;
